@@ -1,8 +1,8 @@
-// server.js
+// server.js - Vercel compatible version
 const express = require('express');
 const axios = require('axios');
 const path = require('path');
-const fs = require('fs').promises;
+const { kv } = require('@vercel/kv');
 require('dotenv').config();
 
 const app = express();
