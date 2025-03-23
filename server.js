@@ -1,8 +1,7 @@
-// server.js - Vercel compatible version
+// server.js - In-memory storage version
 const express = require('express');
 const axios = require('axios');
 const path = require('path');
-const { kv } = require('@vercel/kv');
 require('dotenv').config();
 
 const app = express();
@@ -39,53 +38,21 @@ const initialKnowledgeBases = {
     ]
 };
 
-// Function to ensure knowledge bases are initialized in KV store
-async function ensureKnowledgeBasesInitialized() {
-    try {
-        console.log('Checking if knowledge bases need initialization...');
+// Create in-memory storage using deep copies of initial data
+let knowledgeBases = {
+    kb1: JSON.parse(JSON.stringify(initialKnowledgeBases.kb1)),
+    kb2: JSON.parse(JSON.stringify(initialKnowledgeBases.kb2)),
+    kb3: JSON.parse(JSON.stringify(initialKnowledgeBases.kb3))
+};
 
-        // Check each knowledge base
-        for (const kbId of Object.keys(initialKnowledgeBases)) {
-            const exists = await kv.exists(`kb:${kbId}`);
-
-            if (!exists) {
-                console.log(`Initializing knowledge base: ${kbId}`);
-                await kv.set(`kb:${kbId}`, JSON.stringify(initialKnowledgeBases[kbId]));
-            } else {
-                console.log(`Knowledge base already exists: ${kbId}`);
-            }
-        }
-
-        console.log('Knowledge base initialization complete');
-    } catch (error) {
-        console.error('Error initializing knowledge bases:', error);
-    }
-}
-
-// Call initialization on startup
-ensureKnowledgeBasesInitialized().catch(err => {
-    console.error('Failed to initialize knowledge bases:', err);
-});
-
-// Function to load knowledge base from KV store
+// Function to load knowledge base from memory
 async function loadKnowledgeBase(kbId) {
-    try {
-        const data = await kv.get(`kb:${kbId}`);
-        return data ? JSON.parse(data) : [];
-    } catch (error) {
-        console.error(`Error loading knowledge base ${kbId}:`, error);
-        return [];
-    }
+    return knowledgeBases[kbId] || [];
 }
 
-// Function to save knowledge base to KV store
+// Function to save knowledge base to memory
 async function saveKnowledgeBase(kbId, documents) {
-    try {
-        await kv.set(`kb:${kbId}`, JSON.stringify(documents));
-    } catch (error) {
-        console.error(`Error saving knowledge base ${kbId}:`, error);
-        throw error;
-    }
+    knowledgeBases[kbId] = documents;
 }
 
 // API endpoint to get documents from a specific knowledge base
@@ -206,6 +173,16 @@ app.post('/api/claude/multi', async (req, res) => {
     try {
         const { prompt } = req.body;
 
+        // Check for API key
+        const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+        if (!ANTHROPIC_API_KEY) {
+            console.error('ANTHROPIC_API_KEY not found in environment variables');
+            return res.status(500).json({
+                error: 'Server configuration error',
+                message: 'ANTHROPIC_API_KEY environment variable is missing'
+            });
+        }
+
         // Create an array of promises for querying each knowledge base
         const promises = ['kb1', 'kb2', 'kb3'].map(async (kbId) => {
             try {
@@ -264,7 +241,7 @@ app.post('/api/claude/multi', async (req, res) => {
                     {
                         headers: {
                             'Content-Type': 'application/json',
-                            'x-api-key': process.env.ANTHROPIC_API_KEY,
+                            'x-api-key': ANTHROPIC_API_KEY,
                             'anthropic-version': '2023-06-01'
                         }
                     }
