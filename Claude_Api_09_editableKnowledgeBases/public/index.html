@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multi-Knowledge Base Manager</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Multi-Knowledge Base Manager</h1>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="query">Query</button>
+        <button class="tab" data-tab="manage">Manage Knowledge</button>
+      </div>
+
+      <div id="query-tab" class="tab-content active">
+        <div class="input-section">
+          <textarea
+            id="prompt-input"
+            placeholder="Enter your query here..."
+          ></textarea>
+          <button id="submit-btn">Submit Query</button>
+        </div>
+
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <p>Processing query across knowledge bases...</p>
+        </div>
+
+        <div class="responses-grid">
+          <div class="response-column">
+            <h2>Inclusive Design practice</h2>
+            <p class="kb-description">Methods and Practices</p>
+            <div id="response-kb1" class="response-container"></div>
+          </div>
+
+          <div class="response-column">
+            <h2>Reproductive Health</h2>
+            <p class="kb-description">UK Reproductive Health sources</p>
+            <div id="response-kb2" class="response-container"></div>
+          </div>
+
+          <div class="response-column">
+            <h2>Cardio Vascular Health</h2>
+            <p class="kb-description">British Heart Foundation source</p>
+            <div id="response-kb3" class="response-container"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="manage-tab" class="tab-content">
+        <div class="knowledge-selector">
+          <label for="kb-select">Select Knowledge Base:</label>
+          <select id="kb-select">
+            <option value="kb1">Inclusive Design practice</option>
+            <option value="kb2">Reproductive Health</option>
+            <option value="kb3">Cardio Vascular Health</option>
+          </select>
+        </div>
+
+        <h2>Replace Knowledge Base</h2>
+        <div class="input-area">
+          <input
+            type="text"
+            id="knowledge-title"
+            placeholder="Title"
+            class="full-width"
+          />
+          <textarea
+            id="knowledge-content"
+            placeholder="Content (documentation, guidelines, specifications, etc.)"
+          ></textarea>
+          <button id="replace-knowledge-btn">
+            Replace Selected Knowledge Base
+          </button>
+        </div>
+
+        <div class="knowledge-container">
+          <h2>Knowledge Base Contents</h2>
+          <div id="knowledge-list"></div>
+        </div>
+
+        <div class="reset-container">
+          <button id="reset-kb-btn" class="reset-btn">
+            Reset to Original Knowledge Base
+          </button>
+          <p class="note">
+            This will restore the selected knowledge base to its default state.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
