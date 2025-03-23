@@ -39,91 +39,53 @@ const initialKnowledgeBases = {
     ]
 };
 
-// Function to ensure knowledge base directories exist
-async function ensureKnowledgeBaseDirs() {
-    const dataDir = path.join(__dirname, 'data');
-
+// Function to ensure knowledge bases are initialized in KV store
+async function ensureKnowledgeBasesInitialized() {
     try {
-        await fs.mkdir(dataDir, { recursive: true });
+        console.log('Checking if knowledge bases need initialization...');
 
-        // Create directory for each knowledge base
+        // Check each knowledge base
         for (const kbId of Object.keys(initialKnowledgeBases)) {
-            const kbDir = path.join(dataDir, kbId);
-            await fs.mkdir(kbDir, { recursive: true });
+            const exists = await kv.exists(`kb:${kbId}`);
 
-            // Check if the knowledge base file exists, if not create it with initial data
-            const kbPath = path.join(kbDir, 'documents.json');
-            try {
-                await fs.access(kbPath);
-            } catch (err) {
-                // File doesn't exist, create it with initial data
-                await fs.writeFile(kbPath, JSON.stringify(initialKnowledgeBases[kbId], null, 2), 'utf8');
+            if (!exists) {
+                console.log(`Initializing knowledge base: ${kbId}`);
+                await kv.set(`kb:${kbId}`, JSON.stringify(initialKnowledgeBases[kbId]));
+            } else {
+                console.log(`Knowledge base already exists: ${kbId}`);
             }
         }
+
+        console.log('Knowledge base initialization complete');
     } catch (error) {
-        console.error('Error creating data directories:', error);
+        console.error('Error initializing knowledge bases:', error);
     }
 }
 
-// Function to reset a knowledge base to its initial state
-app.post('/api/knowledge/:kbId/reset', async (req, res) => {
-    try {
-        const { kbId } = req.params;
-
-        // Validate kbId
-        if (!['kb1', 'kb2', 'kb3'].includes(kbId)) {
-            return res.status(400).json({ error: 'Invalid knowledge base ID' });
-        }
-
-        if (!initialKnowledgeBases[kbId]) {
-            return res.status(404).json({ error: 'Initial data not found for this knowledge base' });
-        }
-
-        console.log(`Resetting knowledge base ${kbId} to initial state with ${initialKnowledgeBases[kbId].length} documents`);
-
-        // Reset to initial data - make a deep copy to prevent reference issues
-        const initialDataCopy = JSON.parse(JSON.stringify(initialKnowledgeBases[kbId]));
-        await saveKnowledgeBase(kbId, initialDataCopy);
-
-        res.status(200).json({ message: `Knowledge base ${kbId} reset to initial state` });
-    } catch (error) {
-        console.error(`Error resetting knowledge base ${req.params.kbId}:`, error);
-        res.status(500).json({ error: 'Failed to reset knowledge base' });
-    }
+// Call initialization on startup
+ensureKnowledgeBasesInitialized().catch(err => {
+    console.error('Failed to initialize knowledge bases:', err);
 });
 
-// Initialize directories at startup
-ensureKnowledgeBaseDirs().then(() => {
-    console.log('Knowledge base directories initialized successfully');
-}).catch(err => {
-    console.error('Error initializing knowledge base directories:', err);
-});
-
-// Function to load knowledge base
+// Function to load knowledge base from KV store
 async function loadKnowledgeBase(kbId) {
     try {
-        const kbPath = path.join(__dirname, 'data', kbId, 'documents.json');
-        try {
-            const data = await fs.readFile(kbPath, 'utf8');
-            return JSON.parse(data);
-        } catch (error) {
-            // If file doesn't exist or has invalid JSON, return empty knowledge base
-            if (error.code === 'ENOENT' || error instanceof SyntaxError) {
-                console.log(`Knowledge base file not found for ${kbId}, creating empty`);
-                return [];
-            }
-            throw error;
-        }
+        const data = await kv.get(`kb:${kbId}`);
+        return data ? JSON.parse(data) : [];
     } catch (error) {
         console.error(`Error loading knowledge base ${kbId}:`, error);
         return [];
     }
 }
 
-// Function to save knowledge base
+// Function to save knowledge base to KV store
 async function saveKnowledgeBase(kbId, documents) {
-    const kbPath = path.join(__dirname, 'data', kbId, 'documents.json');
-    await fs.writeFile(kbPath, JSON.stringify(documents, null, 2), 'utf8');
+    try {
+        await kv.set(`kb:${kbId}`, JSON.stringify(documents));
+    } catch (error) {
+        console.error(`Error saving knowledge base ${kbId}:`, error);
+        throw error;
+    }
 }
 
 // API endpoint to get documents from a specific knowledge base
@@ -209,6 +171,33 @@ app.post('/api/knowledge/:kbId/replace', async (req, res) => {
     } catch (error) {
         console.error(`Error replacing knowledge base ${req.params.kbId}:`, error);
         res.status(500).json({ error: 'Failed to replace knowledge base' });
+    }
+});
+
+// Function to reset a knowledge base to its initial state
+app.post('/api/knowledge/:kbId/reset', async (req, res) => {
+    try {
+        const { kbId } = req.params;
+
+        // Validate kbId
+        if (!['kb1', 'kb2', 'kb3'].includes(kbId)) {
+            return res.status(400).json({ error: 'Invalid knowledge base ID' });
+        }
+
+        if (!initialKnowledgeBases[kbId]) {
+            return res.status(404).json({ error: 'Initial data not found for this knowledge base' });
+        }
+
+        console.log(`Resetting knowledge base ${kbId} to initial state with ${initialKnowledgeBases[kbId].length} documents`);
+
+        // Reset to initial data - make a deep copy to prevent reference issues
+        const initialDataCopy = JSON.parse(JSON.stringify(initialKnowledgeBases[kbId]));
+        await saveKnowledgeBase(kbId, initialDataCopy);
+
+        res.status(200).json({ message: `Knowledge base ${kbId} reset to initial state` });
+    } catch (error) {
+        console.error(`Error resetting knowledge base ${req.params.kbId}:`, error);
+        res.status(500).json({ error: 'Failed to reset knowledge base' });
     }
 });
 
@@ -324,3 +313,6 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
+
+// Export for Vercel serverless functions
+module.exports = app;
