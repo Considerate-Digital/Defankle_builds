@@ -31,6 +31,76 @@ document.addEventListener('DOMContentLoaded', () => {
         kb3: document.getElementById('response-kb3')
     };
 
+    // Knowledge Base Headers and Descriptions
+    const kbHeaders = {
+        kb1: document.querySelector('.response-column:nth-child(1) h2'),
+        kb2: document.querySelector('.response-column:nth-child(2) h2'),
+        kb3: document.querySelector('.response-column:nth-child(3) h2')
+    };
+
+    const kbDescriptions = {
+        kb1: document.querySelector('.response-column:nth-child(1) .kb-description'),
+        kb2: document.querySelector('.response-column:nth-child(2) .kb-description'),
+        kb3: document.querySelector('.response-column:nth-child(3) .kb-description')
+    };
+
+    // Load initial metadata for each knowledge base
+    async function loadAllMetadata() {
+        try {
+            const response = await fetch('/api/knowledge/metadata');
+            if (!response.ok) {
+                throw new Error('Failed to fetch knowledge base metadata');
+            }
+
+            const metadata = await response.json();
+
+            // Update headers and descriptions
+            for (const kbId in metadata) {
+                updateKnowledgeBaseUI(kbId, metadata[kbId]);
+            }
+
+            // Update dropdown options in the knowledge selector
+            updateKnowledgeBaseOptions(metadata);
+
+        } catch (error) {
+            console.error('Error loading metadata:', error);
+        }
+    }
+
+    // Update the headers and descriptions in the UI for a specific knowledge base
+    function updateKnowledgeBaseUI(kbId, metadata) {
+        if (kbHeaders[kbId]) {
+            kbHeaders[kbId].textContent = metadata.title;
+        }
+
+        if (kbDescriptions[kbId]) {
+            kbDescriptions[kbId].textContent = metadata.description;
+        }
+    }
+
+    // Update the options in the knowledge base selector dropdown
+    function updateKnowledgeBaseOptions(metadataObj) {
+        const kbSelect = document.getElementById('kb-select');
+        if (!kbSelect) return;
+
+        // Save current selection
+        const currentSelection = kbSelect.value;
+
+        // Update options text but keep the same values
+        Array.from(kbSelect.options).forEach(option => {
+            const kbId = option.value;
+            if (metadataObj[kbId]) {
+                option.textContent = metadataObj[kbId].title;
+            }
+        });
+
+        // Restore selection
+        kbSelect.value = currentSelection;
+    }
+
+    // Call this when the page loads
+    loadAllMetadata();
+
     // Submit query function
     submitBtn.addEventListener('click', async () => {
         const prompt = promptInput.value.trim();
@@ -78,7 +148,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 else {
                     responseContainers[kbId].textContent = 'No response received';
                 }
+
+                // Update UI with metadata if available
+                if (data[kbId] && data[kbId].metadata) {
+                    updateKnowledgeBaseUI(kbId, data[kbId].metadata);
+                }
             });
+
+            // Update dropdown options after a query in case metadata changed
+            const metadataObj = {};
+            Object.keys(data).forEach(kbId => {
+                if (data[kbId] && data[kbId].metadata) {
+                    metadataObj[kbId] = data[kbId].metadata;
+                }
+            });
+
+            if (Object.keys(metadataObj).length > 0) {
+                updateKnowledgeBaseOptions(metadataObj);
+            }
 
         } catch (error) {
             console.error('Error:', error);
@@ -161,19 +248,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Function to replace a knowledge base with updated metadata
     async function replaceKnowledgeBase(title, content, selectedKb) {
         try {
+            // Create metadata from title
+            const metadata = {
+                title: title,
+                description: `Knowledge base about ${title}`
+            };
+
             const response = await fetch(`/api/knowledge/${selectedKb}/replace`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ title, content })
+                body: JSON.stringify({
+                    title,
+                    content,
+                    metadata
+                })
             });
 
             if (!response.ok) {
                 throw new Error(`Failed to replace knowledge base: ${response.statusText}`);
             }
+
+            const result = await response.json();
 
             // Clear inputs
             knowledgeTitleInput.value = '';
@@ -181,6 +281,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Reload knowledge base
             await loadSelectedKnowledgeBase();
+
+            // Update UI with new metadata
+            if (result.metadata) {
+                updateKnowledgeBaseUI(selectedKb, result.metadata);
+
+                // Also update the dropdown
+                const allMetadata = await fetch('/api/knowledge/metadata').then(r => r.json());
+                updateKnowledgeBaseOptions(allMetadata);
+            }
 
             alert(`Knowledge base ${selectedKb} replaced successfully`);
         } catch (error) {
@@ -214,8 +323,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(`Failed to reset knowledge base: ${response.statusText}`);
             }
 
+            const result = await response.json();
+
             // Reload knowledge base
             await loadSelectedKnowledgeBase();
+
+            // Update UI with original metadata
+            if (result.metadata) {
+                updateKnowledgeBaseUI(selectedKb, result.metadata);
+
+                // Also update the dropdown
+                const allMetadata = await fetch('/api/knowledge/metadata').then(r => r.json());
+                updateKnowledgeBaseOptions(allMetadata);
+            }
 
             alert(`Knowledge base ${selectedKb} has been reset to its original state.`);
         } catch (error) {
