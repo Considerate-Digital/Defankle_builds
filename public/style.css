@@ -33,6 +33,36 @@ h2 {
   margin-bottom: 25px;
 }
 
+/* Multiple query fields styling */
+.query-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.query-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.query-field label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #2c3e50;
+}
+
+.prompt-input {
+  width: 100%;
+  height: 80px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
 textarea {
   width: 100%;
   height: 120px;
@@ -68,6 +98,16 @@ button {
 
 button:hover {
   background-color: #a02bc0;
+}
+
+#submit-btn {
+  width: 100%;
+  background-color: #2ecc71;
+  margin-top: 10px;
+}
+
+#submit-btn:hover {
+  background-color: #27ae60;
 }
 
 .loading {
@@ -229,4 +269,149 @@ button:hover {
   color: #6c757d;
   font-size: 14px;
   margin-top: 10px;
+}
+
+.system-prompt-section {
+  background-color: #f0f7ff;
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 30px;
+  border-left: 4px solid #3498db;
+}
+
+.system-prompt-section h2 {
+  color: #2c3e50;
+  margin-top: 0;
+}
+
+.general-system-prompt-section {
+  background-color: #f5f0ff;
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 30px;
+  border-left: 4px solid #9b59b6;
+}
+
+.general-system-prompt-section h2 {
+  color: #2c3e50;
+  margin-top: 0;
+}
+
+.info-text {
+  color: #7f8c8d;
+  font-style: italic;
+  margin-bottom: 15px;
+}
+
+#system-prompt-input,
+#general-system-prompt-input {
+  background-color: #fff;
+  border: 1px solid #b3d4fc;
+  min-height: 120px;
+}
+
+#general-system-prompt-input {
+  border: 1px solid #d4b3fc;
+}
+
+#update-prompt-btn {
+  background-color: #2980b9;
+}
+
+#update-prompt-btn:hover {
+  background-color: #3498db;
+}
+
+#update-general-prompt-btn {
+  background-color: #8e44ad;
+}
+
+#update-general-prompt-btn:hover {
+  background-color: #9b59b6;
+}
+
+/* Metadata display styling */
+.metadata-container {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+#metadata-display {
+  margin-top: 10px;
+}
+
+#metadata-display p {
+  margin: 5px 0;
+}
+
+#knowledge-details {
+  margin-bottom: 20px;
+}
+
+#knowledge-details h3 {
+  color: #2c3e50;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+/* Styling for the system prompt input in the Replace KB section */
+#knowledge-system-prompt {
+  height: 80px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .responses-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .response-column {
+    margin-bottom: 20px;
+  }
+}
+
+.query-questions-section {
+  background-color: #f0fff0;
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 30px;
+  border-left: 4px solid #2ecc71;
+}
+
+.query-questions-section h2 {
+  color: #2c3e50;
+  margin-top: 0;
+}
+
+.question-edit-container {
+  margin-bottom: 15px;
+}
+
+.question-edit-container label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #2c3e50;
+}
+
+.question-input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #b3d4fc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+#update-questions-btn {
+  background-color: #2ecc71;
+  margin-top: 10px;
+}
+
+#update-questions-btn:hover {
+  background-color: #27ae60;
 }

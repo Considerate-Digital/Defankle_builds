@@ -13,14 +13,47 @@
       <div class="tabs">
         <button class="tab active" data-tab="query">Query</button>
         <button class="tab" data-tab="manage">Manage Knowledge</button>
+        <button class="tab" data-tab="settings">System Settings</button>
       </div>
 
       <div id="query-tab" class="tab-content active">
         <div class="input-section">
-          <textarea
-            id="prompt-input"
-            placeholder="Enter your query here..."
-          ></textarea>
+          <div class="query-fields">
+            <div class="query-field">
+              <label id="question-label-1" for="prompt-input-1"
+                >1. What opportunities do you want to explore in this
+                design?</label
+              >
+              <textarea
+                id="prompt-input-1"
+                class="prompt-input"
+                placeholder="Describe the opportunities you wish to explore..."
+              ></textarea>
+            </div>
+
+            <div class="query-field">
+              <label id="question-label-2" for="prompt-input-2"
+                >2. What challenges do you think you will face?</label
+              >
+              <textarea
+                id="prompt-input-2"
+                class="prompt-input"
+                placeholder="Describe the challenges you anticipate..."
+              ></textarea>
+            </div>
+
+            <div class="query-field">
+              <label id="question-label-3" for="prompt-input-3"
+                >3. What problem are you trying to solve in this design?</label
+              >
+              <textarea
+                id="prompt-input-3"
+                class="prompt-input"
+                placeholder="Describe the problem you're addressing..."
+              ></textarea>
+            </div>
+          </div>
+
           <button id="submit-btn">Submit Query</button>
         </div>
 
@@ -50,6 +83,63 @@
         </div>
       </div>
 
+      <div id="settings-tab" class="tab-content">
+        <div class="general-system-prompt-section">
+          <h2>General System Prompt</h2>
+          <p class="info-text">
+            This system prompt applies to all knowledge bases as a foundation.
+            It sets the overall context and tone for Claude's responses.
+          </p>
+          <textarea
+            id="general-system-prompt-input"
+            placeholder="Enter the general system prompt that will apply to all knowledge bases..."
+          ></textarea>
+          <button id="update-general-prompt-btn">
+            Update General System Prompt
+          </button>
+        </div>
+
+        <div class="query-questions-section">
+          <h2>Edit Query Questions</h2>
+          <p class="info-text">
+            Customize the three questions that appear in the query tab. These
+            questions guide users in formulating their queries.
+          </p>
+
+          <div class="question-edit-container">
+            <label for="question-1-input">Question 1:</label>
+            <input
+              type="text"
+              id="question-1-input"
+              class="question-input"
+              placeholder="Enter question 1..."
+            />
+          </div>
+
+          <div class="question-edit-container">
+            <label for="question-2-input">Question 2:</label>
+            <input
+              type="text"
+              id="question-2-input"
+              class="question-input"
+              placeholder="Enter question 2..."
+            />
+          </div>
+
+          <div class="question-edit-container">
+            <label for="question-3-input">Question 3:</label>
+            <input
+              type="text"
+              id="question-3-input"
+              class="question-input"
+              placeholder="Enter question 3..."
+            />
+          </div>
+
+          <button id="update-questions-btn">Update Query Questions</button>
+        </div>
+      </div>
+
       <div id="manage-tab" class="tab-content">
         <div class="knowledge-selector">
           <label for="kb-select">Select Knowledge Base:</label>
@@ -58,6 +148,21 @@
             <option value="kb2">Reproductive Health</option>
             <option value="kb3">Cardio Vascular Health</option>
           </select>
+        </div>
+
+        <!-- KB-Specific System Prompt Section -->
+        <div class="system-prompt-section">
+          <h2>Update Knowledge Base System Prompt</h2>
+          <p class="info-text">
+            This system prompt is specific to this knowledge base and extends
+            the general system prompt. It guides Claude on how to use this
+            particular knowledge base.
+          </p>
+          <textarea
+            id="system-prompt-input"
+            placeholder="Enter knowledge base specific system prompt..."
+          ></textarea>
+          <button id="update-prompt-btn">Update KB System Prompt</button>
         </div>
 
         <h2>Replace Knowledge Base</h2>
@@ -72,6 +177,15 @@
             id="knowledge-content"
             placeholder="Content (documentation, guidelines, specifications, etc.)"
           ></textarea>
+          <p>
+            <label for="knowledge-system-prompt"
+              >KB-Specific System Prompt (optional):</label
+            >
+          </p>
+          <textarea
+            id="knowledge-system-prompt"
+            placeholder="Enter a system prompt specific to this knowledge base (optional)"
+          ></textarea>
           <button id="replace-knowledge-btn">
             Replace Selected Knowledge Base
           </button>
@@ -79,6 +193,13 @@
 
         <div class="knowledge-container">
           <h2>Knowledge Base Contents</h2>
+          <div id="knowledge-details">
+            <div class="metadata-container">
+              <h3>Metadata</h3>
+              <div id="metadata-display"></div>
+            </div>
+            <h3>Documents</h3>
+          </div>
           <div id="knowledge-list"></div>
         </div>
 
@@ -96,4 +217,3 @@
     <script src="script.js"></script>
   </body>
 </html>
-<!--end -->

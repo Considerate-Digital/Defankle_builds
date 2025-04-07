@@ -13,12 +13,16 @@ app.use(express.json());
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+// General system prompt that applies to all knowledge bases
+let generalSystemPrompt = "You are an inclusive design specialist providing advice within this context when answering queries. Focus on accessibility, universal design principles, and creating solutions that work for people of all abilities and backgrounds. Use the information provided in the query to inform your advice and ground your answers.";
+
 // Initial knowledge bases with one document each and metadata
 const initialKnowledgeBases = {
     kb1: {
         metadata: {
             title: "Inclusive Design Practice",
-            description: "Methods and Practices"
+            description: "Methods and Practices",
+            systemPrompt: "Use this inclusive design knowledge base to provide practical, evidence-based advice for designing products and services that work for everyone. Consider accessibility, cultural sensitivity, and diverse user needs in your responses."
         },
         documents: [
             {
@@ -31,7 +35,8 @@ const initialKnowledgeBases = {
     kb2: {
         metadata: {
             title: "Reproductive Health",
-            description: "UK Reproductive Health sources"
+            description: "UK Reproductive Health sources",
+            systemPrompt: "Use this reproductive health knowledge base to provide factual, medically accurate information based on the latest research. Apply an inclusive design lens to ensure information is accessible to all genders and backgrounds."
         },
         documents: [
             {
@@ -44,7 +49,8 @@ const initialKnowledgeBases = {
     kb3: {
         metadata: {
             title: "Cardio Vascular Health",
-            description: "British Heart Foundation source"
+            description: "British Heart Foundation source",
+            systemPrompt: "Use this cardiovascular health knowledge base to provide evidence-based information focused on the disparities in cardiovascular care between different populations. Apply inclusive design principles to ensure information is accessible to all."
         },
         documents: [
             {
@@ -88,6 +94,17 @@ async function saveKnowledgeBaseMetadata(kbId, metadata) {
     } else {
         knowledgeBases[kbId].metadata = metadata;
     }
+}
+
+// Function to get the general system prompt
+async function getGeneralSystemPrompt() {
+    return generalSystemPrompt;
+}
+
+// Function to update the general system prompt
+async function updateGeneralSystemPrompt(newPrompt) {
+    generalSystemPrompt = newPrompt;
+    return generalSystemPrompt;
 }
 
 // API endpoint to get all knowledge base metadata
@@ -140,6 +157,37 @@ app.get('/api/knowledge/:kbId/metadata', async (req, res) => {
     }
 });
 
+// API endpoint to get the general system prompt
+app.get('/api/generalsystemprompt', async (req, res) => {
+    try {
+        const prompt = await getGeneralSystemPrompt();
+        res.json({ generalSystemPrompt: prompt });
+    } catch (error) {
+        console.error('Error fetching general system prompt:', error);
+        res.status(500).json({ error: 'Failed to fetch general system prompt' });
+    }
+});
+
+// API endpoint to update the general system prompt
+app.post('/api/generalsystemprompt', async (req, res) => {
+    try {
+        const { generalSystemPrompt } = req.body;
+
+        if (!generalSystemPrompt || typeof generalSystemPrompt !== 'string') {
+            return res.status(400).json({ error: 'General system prompt is required and must be a string' });
+        }
+
+        const updatedPrompt = await updateGeneralSystemPrompt(generalSystemPrompt);
+        res.status(200).json({
+            message: 'General system prompt updated successfully',
+            generalSystemPrompt: updatedPrompt
+        });
+    } catch (error) {
+        console.error('Error updating general system prompt:', error);
+        res.status(500).json({ error: 'Failed to update general system prompt' });
+    }
+});
+
 // API endpoint to add a document to a specific knowledge base
 app.post('/api/knowledge/:kbId', async (req, res) => {
     try {
@@ -178,7 +226,7 @@ app.post('/api/knowledge/:kbId', async (req, res) => {
 app.post('/api/knowledge/:kbId/replace', async (req, res) => {
     try {
         const { kbId } = req.params;
-        const { title, content, metadata } = req.body;
+        const { title, content, metadata, systemPrompt } = req.body;
 
         // Validate kbId
         if (!['kb1', 'kb2', 'kb3'].includes(kbId)) {
@@ -201,16 +249,23 @@ app.post('/api/knowledge/:kbId/replace', async (req, res) => {
 
         await saveKnowledgeBase(kbId, newKnowledgeBase);
 
-        // Update metadata if provided
-        if (metadata && typeof metadata === 'object') {
-            await saveKnowledgeBaseMetadata(kbId, metadata);
-        } else {
-            // Use the document title as metadata title if no specific metadata provided
-            await saveKnowledgeBaseMetadata(kbId, {
-                title: title,
-                description: `Knowledge base for ${title}`
-            });
+        // Set up metadata with system prompt
+        let updatedMetadata = {
+            title: title,
+            description: `Knowledge base for ${title}`
+        };
+
+        // Add system prompt if provided
+        if (systemPrompt) {
+            updatedMetadata.systemPrompt = systemPrompt;
         }
+
+        // Override with provided metadata if it exists
+        if (metadata && typeof metadata === 'object') {
+            updatedMetadata = { ...updatedMetadata, ...metadata };
+        }
+
+        await saveKnowledgeBaseMetadata(kbId, updatedMetadata);
 
         res.status(200).json({
             message: `Knowledge base ${kbId} replaced successfully`,
@@ -251,6 +306,42 @@ app.post('/api/knowledge/:kbId/reset', async (req, res) => {
     }
 });
 
+// API endpoint to update just the system prompt for a knowledge base
+app.post('/api/knowledge/:kbId/systemprompt', async (req, res) => {
+    try {
+        const { kbId } = req.params;
+        const { systemPrompt } = req.body;
+
+        // Validate kbId
+        if (!['kb1', 'kb2', 'kb3'].includes(kbId)) {
+            return res.status(400).json({ error: 'Invalid knowledge base ID' });
+        }
+
+        if (!systemPrompt || typeof systemPrompt !== 'string') {
+            return res.status(400).json({ error: 'System prompt is required and must be a string' });
+        }
+
+        // Get current metadata
+        const currentMetadata = await loadKnowledgeBaseMetadata(kbId);
+
+        // Update system prompt
+        const updatedMetadata = {
+            ...currentMetadata,
+            systemPrompt: systemPrompt
+        };
+
+        await saveKnowledgeBaseMetadata(kbId, updatedMetadata);
+
+        res.status(200).json({
+            message: `System prompt for ${kbId} updated successfully`,
+            metadata: updatedMetadata
+        });
+    } catch (error) {
+        console.error(`Error updating system prompt for ${req.params.kbId}:`, error);
+        res.status(500).json({ error: 'Failed to update system prompt' });
+    }
+});
+
 // API endpoint to query all knowledge bases simultaneously
 app.post('/api/claude/multi', async (req, res) => {
     try {
@@ -266,17 +357,22 @@ app.post('/api/claude/multi', async (req, res) => {
             });
         }
 
+        // Get the general system prompt
+        const generalPrompt = await getGeneralSystemPrompt();
+
         // Create an array of promises for querying each knowledge base
         const promises = ['kb1', 'kb2', 'kb3'].map(async (kbId) => {
             try {
                 // Get metadata for the knowledge base
                 const metadata = await loadKnowledgeBaseMetadata(kbId);
 
-                // Define system prompt based on knowledge base
-                let systemPrompt = "You are a helpful AI assistant specialized in providing clear, concise technical information.";
+                // Combine general system prompt with the KB-specific one
+                let systemPrompt = generalPrompt;
 
-                // Customize system prompt based on knowledge base metadata
-                systemPrompt += ` Focus on ${metadata.title} information: ${metadata.description}.`;
+                // Add KB-specific prompt if available
+                if (metadata.systemPrompt) {
+                    systemPrompt = `${generalPrompt}\n\n${metadata.systemPrompt}`;
+                }
 
                 // Load documents from the knowledge base
                 const documents = await loadKnowledgeBase(kbId);
@@ -290,7 +386,7 @@ app.post('/api/claude/multi', async (req, res) => {
                         ).join("\n\n");
 
                     // Enhance system prompt with knowledge context instruction
-                    systemPrompt += " Use the provided knowledge base to inform your responses when relevant.";
+                    systemPrompt += "\n\nUse the provided knowledge base to inform your responses when relevant.";
                 }
 
                 // Prepare user message with knowledge context
