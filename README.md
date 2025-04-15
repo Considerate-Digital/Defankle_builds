@@ -39,7 +39,7 @@ The general system prompt is what instructs the overall query and behaviour of t
 1. Clone the repository
 
 ```
-git clone "https://github.com/j3nsykes/Defankle_builds"
+git clone "https://github.com/Considerate-Digital/Defankle_builds"
 
 ```
 
@@ -91,7 +91,7 @@ Before you begin, create an account on Vercel. The simplest way to deploy is to 
 1. Clone the repository
 
 ```
-git clone "https://github.com/j3nsykes/Defankle_builds"
+git clone "https://github.com/Considerate-Digital/Defankle_builds"
 
 ```
 
