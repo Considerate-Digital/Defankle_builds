@@ -138,7 +138,7 @@ npm install
 │   ├── style.css               # CSS styles for the application
 │   └── script.js               # Client-side JavaScript for the UI
 │
-└── node_modules/               # Node.js installed packages (generated)
+└── node_modules/               # Node.js installed packages
 ```
 
 8. Push the recent changes to your Github repo.
