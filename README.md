@@ -205,4 +205,6 @@ ANTHROPIC_API_KEY=your_api_key_copied_here
 
 This project was made by Alex and Jen at Considerate Digital. If you need support please [contact us](https://considerate.digital).
 
+### System Architecture
+
 [View system diagram and future iteration suggestions here ![](https://app.eraser.io/workspace/ICGIWlI0KeSv68A1feZs/preview?elements=C0ZVSjn2lKvnnEOUOZ8BZQ&type=embed)](https://app.eraser.io/workspace/ICGIWlI0KeSv68A1feZs?elements=C0ZVSjn2lKvnnEOUOZ8BZQ)
