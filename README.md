@@ -137,21 +137,42 @@ npm install
 └── node_modules/               # Node.js installed packages
 ```
 
-8. Push the recent changes to your Github repo.
+8. Copy/paste the following into your `vercel.json` file.
 
-9. In the Vercel Dashboard, select 'add new project' and opt to Import Git Repository.
+```json
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/server.js"
+    }
+  ]
+}
+```
 
-10. Select your repository from the list and click import.
+9. Push the recent changes to your Github repo.
 
-11. When you deploy to Vercel, your local .env file isn't uploaded or used by default. Instead, you need to set the environment variables directly in the Vercel dashboard.
+10. In the Vercel Dashboard, select 'add new project' and opt to Import Git Repository.
 
-12. Navigate to "Environment Variables" at the bottom of the project settings.
-13. Add a new variable:
+11. Select your repository from the list and click import.
+
+12. When you deploy to Vercel, your local .env file isn't uploaded or used by default. Instead, you need to set the environment variables directly in the Vercel dashboard.
+
+13. Navigate to "Environment Variables" at the bottom of the project settings.
+
+14. Add a new variable:
     NAME: ANTHROPIC_API_KEY
     VALUE: Paste your live API key
-14. Click "Deploy" to deploy your application.
+15. Click "Deploy" to deploy your application.
 
-15. This may take a few minutes to deploy, afterwhich you will be provided with a URL where your application is hosted.
+16. This may take a few minutes to deploy, afterwhich you will be provided with a URL where your application is hosted.
 
 ## Production Setup
 
