@@ -207,4 +207,4 @@ This project was made by Alex and Jen at Considerate Digital. If you need suppor
 
 ### System Architecture
 
-[View system diagram and future iteration suggestions here ![](https://app.eraser.io/workspace/ICGIWlI0KeSv68A1feZs/preview?elements=C0ZVSjn2lKvnnEOUOZ8BZQ&type=embed)](https://app.eraser.io/workspace/ICGIWlI0KeSv68A1feZs?elements=C0ZVSjn2lKvnnEOUOZ8BZQ)
+[View system diagram and future iteration suggestions by clicking here ![](https://app.eraser.io/workspace/ICGIWlI0KeSv68A1feZs/preview?elements=C0ZVSjn2lKvnnEOUOZ8BZQ&type=embed)](https://app.eraser.io/workspace/ICGIWlI0KeSv68A1feZs?elements=C0ZVSjn2lKvnnEOUOZ8BZQ)
