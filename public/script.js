@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "3. What problem are you trying to solve in this design?"
     ];
 
-    // Store current questions - initialize with defaults
+    // Store current questions - initialise with defaults
     let currentQuestions = [...defaultQuestions];
 
     // Tab functionality
@@ -91,9 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Load saved questions on page initialization
+    // Load saved questions on page initialisation
     function initializeQuestions() {
-        // Try to load questions from localStorage
+        // load questions from localStorage
         const savedQuestions = localStorage.getItem('queryQuestions');
         if (savedQuestions) {
             currentQuestions = JSON.parse(savedQuestions);
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Initialize questions when the page loads
+    // Initialise questions when the page loads
     initializeQuestions();
 
     // Query tab functionality

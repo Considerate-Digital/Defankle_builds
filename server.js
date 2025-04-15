@@ -1,4 +1,4 @@
-// server.js - In-memory storage version with metadata support
+// server.js - In-memory storage
 const express = require('express');
 const axios = require('axios');
 const path = require('path');
@@ -16,7 +16,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // General system prompt that applies to all knowledge bases
 let generalSystemPrompt = "You are an inclusive design specialist providing advice within this context when answering queries. Focus on accessibility, universal design principles, and creating solutions that work for people of all abilities and backgrounds. Use the information provided in the query to inform your advice and ground your answers.";
 
-// Initial knowledge bases with one document each and metadata
+// Setup initial knowledge bases with one document each and metadata
 const initialKnowledgeBases = {
     kb1: {
         metadata: {
@@ -62,7 +62,7 @@ const initialKnowledgeBases = {
     }
 };
 
-// Create in-memory storage using deep copies of initial data
+// Create in-memory storage of initial data
 let knowledgeBases = {
     kb1: JSON.parse(JSON.stringify(initialKnowledgeBases.kb1)),
     kb2: JSON.parse(JSON.stringify(initialKnowledgeBases.kb2)),
@@ -121,7 +121,7 @@ app.get('/api/knowledge/metadata', async (req, res) => {
     }
 });
 
-// API endpoint to get documents from a specific knowledge base
+// API endpoint to get text from a specific knowledge base
 app.get('/api/knowledge/:kbId', async (req, res) => {
     try {
         const { kbId } = req.params;
@@ -188,13 +188,13 @@ app.post('/api/generalsystemprompt', async (req, res) => {
     }
 });
 
-// API endpoint to add a document to a specific knowledge base
+// API endpoint to add a document text to a specific knowledge base
 app.post('/api/knowledge/:kbId', async (req, res) => {
     try {
         const { kbId } = req.params;
         const { title, content } = req.body;
 
-        // Validate kbId
+        // Validate knowledge base Id
         if (!['kb1', 'kb2', 'kb3'].includes(kbId)) {
             return res.status(400).json({ error: 'Invalid knowledge base ID' });
         }
@@ -228,7 +228,7 @@ app.post('/api/knowledge/:kbId/replace', async (req, res) => {
         const { kbId } = req.params;
         const { title, content, metadata, systemPrompt } = req.body;
 
-        // Validate kbId
+        // Validate knowledge base ID
         if (!['kb1', 'kb2', 'kb3'].includes(kbId)) {
             return res.status(400).json({ error: 'Invalid knowledge base ID' });
         }
@@ -282,7 +282,7 @@ app.post('/api/knowledge/:kbId/reset', async (req, res) => {
     try {
         const { kbId } = req.params;
 
-        // Validate kbId
+        // Validate knowledge base ID
         if (!['kb1', 'kb2', 'kb3'].includes(kbId)) {
             return res.status(400).json({ error: 'Invalid knowledge base ID' });
         }
@@ -293,7 +293,7 @@ app.post('/api/knowledge/:kbId/reset', async (req, res) => {
 
         console.log(`Resetting knowledge base ${kbId} to initial state with ${initialKnowledgeBases[kbId].documents.length} documents`);
 
-        // Reset to initial data - make a deep copy to prevent reference issues
+        // Reset to initial data - make a copy to prevent reference issues
         knowledgeBases[kbId] = JSON.parse(JSON.stringify(initialKnowledgeBases[kbId]));
 
         res.status(200).json({
@@ -312,7 +312,7 @@ app.post('/api/knowledge/:kbId/systemprompt', async (req, res) => {
         const { kbId } = req.params;
         const { systemPrompt } = req.body;
 
-        // Validate kbId
+        // Validate knowledge base ID
         if (!['kb1', 'kb2', 'kb3'].includes(kbId)) {
             return res.status(400).json({ error: 'Invalid knowledge base ID' });
         }
@@ -465,5 +465,6 @@ app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
 
+// if useing Vercel (comment out if running locally)
 // Export for Vercel serverless functions
 module.exports = app;

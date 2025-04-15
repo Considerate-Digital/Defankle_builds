@@ -1,3 +1,5 @@
+/* general styling   */
+
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
@@ -356,7 +358,7 @@ button:hover {
   padding-bottom: 5px;
 }
 
-/* Styling for the system prompt input in the Replace KB section */
+/* Styling for the system prompt input */
 #knowledge-system-prompt {
   height: 80px;
   margin-top: 5px;
@@ -374,6 +376,7 @@ button:hover {
   }
 }
 
+/* query questions */
 .query-questions-section {
   background-color: #f0fff0;
   border-radius: 6px;
