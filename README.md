@@ -32,9 +32,9 @@ In this section users or workshop facilitators can edit the three query question
 
 The general system prompt is what instructs the overall query and behaviour of the resulting answers.. What you put in here influences all of the answers. It's useful to use this as a set of instructions as to set a tone of the reply, how you would like to receive answers, what key metrics you want to extract every time and in what format or order. The more specific the instructions are here, the more consistent the structure of the answers will be across the three Knowledge Base answers.
 
-# Build
+## Build
 
-## Local setup
+### Local setup
 
 1. Clone the repository
 
@@ -80,7 +80,7 @@ npm run dev
 
 8. Navigate to your app at http://localhost:3000
 
-## Vercel deployment
+### Vercel deployment
 
 [Vercel](https://vercel.com/docs) is a useful platform for deploying web applications. You can easily deploy this build to Vercel to share it with others.
 
@@ -174,7 +174,7 @@ npm install
 
 16. This may take a few minutes to deploy, afterwhich you will be provided with a URL where your application is hosted.
 
-## Production Setup
+### Production Setup
 
 You may wish to deploy the application to a cloud server of your choosing. The deployment options vary between providers. Many organisations will opt to create a containerised application, building an image using Docker or containerd, and then deploying the application image using Podman, Docker, containerd, Ansible or Kubernetes.
 
@@ -182,7 +182,7 @@ Building an image can be automated using traditional system scripting or using D
 
 It is common practice to separate applications into microservices for scalable deployment. In this case, this would involve separating the “backend” server application, the “frontend” client-side application, any data storage such as vector or traditional databases, and any fine tuned models with API (webserver) access.
 
-## Environmental Variables
+### Environmental Variables
 
 Before the app can run, you need to tell it how to connect to the various services that it deploys. These are detailed in the `.env` file at the root of the project.
 
